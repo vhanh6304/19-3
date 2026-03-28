@@ -10,17 +10,13 @@ const LoginPage = () => {
   try {
     const res = await axiosClient.post('/user/login', values);
     
-    // Log ra để kiểm tra thực tế
-    console.log("Status:", res.status); 
-    console.log("Data:", res.data);
-
-    // CHỈNH SỬA QUAN TRỌNG:
-    // Chấp nhận nếu status là 200 HOẶC 304, hoặc nếu có systemRole là Student
-    if (res.status === 200 || res.status === 304 || res.data?.systemRole === 'Student') {
+    // Vì axiosClient interceptor đã tự động trả về response.data, nên res chính là data
+    console.log("Dữ liệu trả về:", res);
       
-      // Lấy token (nếu có), nếu không có thì dùng token cũ hoặc fake token
-      const token = res.data?.metadata?.accessToken || res.data?.token || localStorage.getItem('token') || 'fake-token-ptit';
+    // Lấy token an toàn từ data
+    const token = res?.metadata?.accessToken || res?.token || res?.data?.token || localStorage.getItem('token') || 'fake-token-ptit';
       
+    if (token) {
       localStorage.setItem('token', token);
       message.success('Đăng nhập thành công!');
       navigate('/admin'); // Ép chuyển trang
